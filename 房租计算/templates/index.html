@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <me        .input-section,
+        .output-section {
+            width: 50%;
+            background: var(--card-background);
+            border-radius: var(--border-radius);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+            box-sizing: border-box;
+            overflow-y: auto;
+            max-height: 100%;
+        }"UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>房租水电气账单计算</title>
+    <style>
+        :root {
+            --primary-color: #4CAF50;
+            --primary-dark: #45a049;
+            --secondary-color: #FFC107;
+            --text-color: #333;
+            --background-color: #F5F7FA;
+            --card-background: #FFFFFF;
+            --border-radius: 12px;
+            --transition-speed: 0.3s;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--background-color);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            color: var(--text-color);
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--text-color);
+            font-size: 2.5rem;
+            margin: 1rem 0;
+            font-weight: 600;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .container {
+            display: flex;
+            flex: 1;
+            height: calc(100vh - 5rem);
+            padding: 0 60px;
+            gap: 60px;
+            box-sizing: border-box;
+        }
+
+        .input-section,
+        .output-section {
+            width: 50%;
+            background: var(--card-background);
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+            box-sizing: border-box;
+            overflow-y: auto;
+            max-height: 100%;
+        }
+
+        .input-section {
+            font-size: 1.5em;
+        }
+
+        .output-section {
+            font-size: 2em;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-color);
+        }
+
+        input[type="number"],
+        input[type="text"],
+        input[type="date"],
+        select {
+            width: 100%;
+            padding: 0.6rem;
+            margin-bottom: 0.8rem;
+            border: 2px solid #E0E7FF;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all var(--transition-speed);
+            outline: none;
+            box-sizing: border-box;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: var(--text-color);
+            box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
+        }
+
+        button {
+            width: 100%;
+            padding: 1rem;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all var(--transition-speed);
+            margin-top: 1rem;
+        }
+
+        button:hover {
+            background-color: var(--primary-dark);
+            box-shadow: 0 2px 6px rgba(33, 150, 243, 0.2);
+        }
+
+        h2 {
+            text-align: center;
+            margin-top: 10px;
+            margin-bottom: 5px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            border-radius: 8px;
+            overflow: hidden;
+            background-color: #fff;
+        }
+
+        table,
+        th,
+        td {
+            border: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            text-align: left;
+        }
+
+        td {
+            padding: 10px;
+            text-align: left;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        td[colspan="5"] {
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .error {
+            color: #DC3545;
+            text-align: center;
+            margin-top: 1rem;
+            padding: 1rem;
+            background-color: #FFF3F3;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+
+        .receipt-info {
+            display: flex;
+            justify-content: center;
+            font-weight: bold;
+            margin-bottom: 5px;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        .receipt-info div {
+            margin: 0 20px;
+            display: inline-block;
+        }
+
+        @media (max-width: 1024px) {
+            .container {
+                flex-direction: column;
+                padding: 1rem;
+            }
+
+            .input-section,
+            .output-section {
+                width: 100%;
+            }
+
+            h1 {
+                font-size: 2rem;
+                margin: 1rem 0;
+            }
+        }
+    </style>
+    <script>
+        // 页面加载时设置默认日期
+        window.onload = function () {
+            var lastDate = '{{ last_date }}';  // 从后端获取日期
+            var today = new Date();
+            var dd = String(today.getDate()).padStart(2, '0');
+            var mm = String(today.getMonth() + 1).padStart(2, '0');
+            var yyyy = today.getFullYear();
+            var todayStr = yyyy + '-' + mm + '-' + dd;
+
+            // 优先使用后端传来的日期，如果没有则使用今天的日期
+            var defaultDate = lastDate && lastDate !== 'None' ? lastDate : todayStr;
+            document.getElementById('selected_date').value = defaultDate;
+        }
+    </script>
+</head>
+
+<body>
+
+    <h1>房租水电气账单计算</h1>
+
+    <div class="container">
+        <!-- 输入部分（左侧） -->
+        <div class="input-section">
+            <form method="POST" action="/calculate">
+                <label for="selected_date">日期:</label>
+                <input type="date" id="selected_date" name="selected_date" required><br>
+
+                <label for="building">楼栋:</label>
+                <select id="building" name="building" required>
+                    {% for b in buildings %}
+                    <option value="{{ b }}" {% if building is defined and building==b %}selected{% endif %}>{{ b }}
+                    </option>
+                    {% endfor %}
+                </select><br>
+                <label for="room">房间号:</label>
+                <input type="text" id="room" name="room" required><br>
+
+                <label for="current_water">当月水表数:</label>
+                <input type="number" id="current_water" name="current_water" required><br>
+
+                <label for="current_electric">当月电表数:</label>
+                <input type="number" id="current_electric" name="current_electric" required><br>
+
+                <label for="current_gas">当月气表数:</label>
+                <input type="number" id="current_gas" name="current_gas" required><br>
+
+                <button type="submit">计算费用</button>
+            </form>
+        </div>
+
+        <!-- 输出部分（右侧） -->
+        <div class="output-section">
+            <h2>房租收据</h2>
+            <div class="receipt-info">
+                <div>楼栋：{{ building }}</div>
+                <div>房间：{% if room is defined %}{{ room }}{% else %}--{% endif %}</div>
+                <div>日期：{{ date }}</div>
+            </div>
+            <table>
+                <tr>
+                    <th>{% if room is defined %}{{ room }}{% else %}房间号{% endif %}</th>
+                    <th>上月</th>
+                    <th>本月</th>
+                    <th>实用</th>
+                    <th>单价</th>
+                    <th>金额</th>
+                </tr>
+                <tr>
+                    <td>水费</td>
+                    <td>{% if last_water is defined %}{{ last_water|int }}{% else %}--{% endif %}</td>
+                    <td>{% if current_water is defined %}{{ current_water|int }}{% else %}--{% endif %}</td>
+                    <td>{% if water_usage is defined %}{{ water_usage|int }}{% else %}--{% endif %}</td>
+                    <td>{% if water_price is defined %}{{ water_price|smart_float }}{% else %}5{% endif %}</td>
+                    <td>{% if water_fee is defined %}{{ water_fee|smart_float }}{% else %}--{% endif %}</td>
+                </tr>
+                <tr>
+                    <td>电费</td>
+                    <td>{% if last_electric is defined %}{{ last_electric|int }}{% else %}--{% endif %}</td>
+                    <td>{% if current_electric is defined %}{{ current_electric|int }}{% else %}--{% endif %}</td>
+                    <td>{% if electric_usage is defined %}{{ electric_usage|int }}{% else %}--{% endif %}</td>
+                    <td>{% if electric_price is defined %}{{ electric_price|smart_float }}{% else %}0.7{% endif %}</td>
+                    <td>{% if electric_fee is defined %}{{ electric_fee|smart_float }}{% else %}--{% endif %}</td>
+                </tr>
+                <tr>
+                    <td>气费</td>
+                    <td>{% if last_gas is defined %}{{ last_gas|int }}{% else %}--{% endif %}</td>
+                    <td>{% if current_gas is defined %}{{ current_gas|int }}{% else %}--{% endif %}</td>
+                    <td>{% if gas_usage is defined %}{{ gas_usage|int }}{% else %}--{% endif %}</td>
+                    <td>3.5</td>
+                    <td>{% if gas_fee is defined %}{{ gas_fee|smart_float }}{% else %}--{% endif %}</td>
+                </tr>
+                <tr>
+                    <td>房租</td>
+                    <td colspan="5">{% if rent is defined %}{{ rent|smart_float }}{% else %}--{% endif %}</td>
+                </tr>
+                <tr>
+                    <td>管理费</td>
+                    <td colspan="5">{% if management_fee is defined %}{{ management_fee|smart_float }}{% else %}--{%
+                        endif %}</td>
+                </tr>
+                <tr>
+                    <td>网费</td>
+                    <td colspan="5">{% if internet_fee is defined %}{{ internet_fee|smart_float }}{% else %}--{% endif
+                        %}</td>
+                </tr>
+                <tr>
+                    <td>合计</td>
+                    <td colspan="5">{% if total_price is defined %}{{ total_price|smart_float }}{% else %}--{% endif %}
+                    </td>
+                </tr>
+            </table>
+
+            {% if error %}
+            <p class="error">{{ error }}</p>
+            {% endif %}
+        </div>
+    </div>
+
+</body>
+
+</html>
